@@ -12,9 +12,9 @@ Este proyecto en Swift permite importar y reproducir archivos de audio. Los arch
 
 ## Requisitos
 
-- **Xcode**: Requiere Xcode 12 o superior.
+- **Xcode**: Requiere Xcode 15 o superior.
 - **Swift**: El proyecto está desarrollado en Swift 5.3 o superior.
-- **iOS 13+**: Requiere iOS 13.0 o superior.
+- **iOS 17+**: Requiere iOS 17.0 o superior.
 
 ## Instalación
 
