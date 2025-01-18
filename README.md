@@ -1,5 +1,4 @@
 # DCAudioPlayer
-# Proyecto de Reproductor de Audio en Swift
 
 Este proyecto en Swift permite importar y reproducir archivos de audio. Los archivos de audio se mantienen organizados en una vista principal, donde el usuario puede buscar fácilmente entre ellos. El reproductor de audio permite la reproducción en segundo plano, lo que significa que los usuarios pueden escuchar música mientras navegan por otras aplicaciones.
 
