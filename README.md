@@ -21,13 +21,13 @@ Este proyecto en Swift permite importar y reproducir archivos de audio. Los arch
 1. Clona este repositorio a tu máquina local:
 
 ```bash
-git clone https://github.com/tuusuario/proyecto-reproductor-audio.git
+git clone https://github.com/novecapa/DCAudioPlayer.git
 ```
 
 2. Abre el proyecto en Xcode:
 
 ```bash
-open ProyectoReproductorAudio.xcworkspace
+open DCAudioPlayer.xcworkspace
 ```
 
 3. Ejecuta la aplicación en el simulador o dispositivo físico.
