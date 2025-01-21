@@ -19,12 +19,21 @@ struct AudioRow: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            AsyncImageLoader(url: audio.authorImageURL,
-                             placeHolder: audio.authorPlaceholder)
-            .clipShape(Circle())
-            .frame(width: 40, height: 40)
-            .padding(.leading, 12)
-
+            if let image = UIImage(contentsOfFile: audio.authorAvatar) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(Circle())
+                    .frame(width: 40, height: 40)
+                    .padding(.leading, 12)
+            } else {
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(Circle())
+                    .frame(width: 40, height: 40)
+                    .padding(.leading, 12)
+            }
             VStack(alignment: .leading) {
                 Text(audio.title)
                     .font(.headline)

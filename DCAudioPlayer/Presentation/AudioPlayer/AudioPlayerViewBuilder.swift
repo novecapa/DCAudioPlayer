@@ -9,14 +9,11 @@
 import Foundation
 
 protocol AudioPlayerViewBuilderProtocol {
-	func build(_ manager: AudioPlayerManager,
-               audioFile: AudioFileEntity) -> AudioPlayerView
+	func build(_ manager: AudioPlayerManager, audioFile: AudioFileEntity) -> AudioPlayerView
 }
 
 final class AudioPlayerViewBuilder: AudioPlayerViewBuilderProtocol {
-	func build(_ manager: AudioPlayerManager,
-               audioFile: AudioFileEntity = .empty) -> AudioPlayerView {
-        let utils: UtilsProtocol = Utils()
+	func build(_ manager: AudioPlayerManager, audioFile: AudioFileEntity = .empty) -> AudioPlayerView {
         let persistentContainer = SwiftDataContainer(isStoredInMemoryOnly: false)
         let database = AudioFileDatabase(databaseManager: persistentContainer)
         let repository = AudioFilesRepository(audioFilesDatabse: database)

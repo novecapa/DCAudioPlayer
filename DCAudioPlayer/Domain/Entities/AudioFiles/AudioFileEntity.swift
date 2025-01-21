@@ -34,22 +34,6 @@ struct AudioFileEntity: Equatable {
 
     let dateCreated: Double
     let dateUpdated: Double
-
-    var authorImageURL: URL? {
-        URL(string: authorAvatar)
-    }
-
-    var authorPlaceholder: Image? {
-        Image(systemName: "person.circle.fill")
-            .resizable()
-            .scaledToFit()
-            .clipShape(Circle())
-            .frame(width: 40, height: 40) as? Image
-    }
-
-    var audioCoverURL: URL? {
-        URL(string: cover)
-    }
 }
 
 // MARK: Mocks

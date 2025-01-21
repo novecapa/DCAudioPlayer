@@ -12,6 +12,15 @@ import SwiftUI
 @Observable
 final class MainViewModel {
 
+    var alertMessage: String = "" {
+        didSet {
+            if !alertMessage.isEmpty {
+                showAlert = true
+            }
+        }
+    }
+    var showAlert: Bool = false
+
     private let utils: UtilsProtocol
     private let useCase: AudioFileUseCaseProtocol
     init(utils: UtilsProtocol,
@@ -30,8 +39,7 @@ final class MainViewModel {
                 .errorFetch(let message),
                 .errorSearch(let message),
                 .errorDelete(let message):
-//            alertMessage = message
-            break
+            alertMessage = message
         }
     }
 
@@ -40,6 +48,12 @@ final class MainViewModel {
                                                selector: #selector(handleReceivedMP3File(notification:)),
                                                name: Notification.Name(.didReceiveMP3File),
                                                object: nil)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self,
+                                                  name: Notification.Name(.didReceiveMP3File),
+                                                  object: nil)
     }
 
     @objc func handleReceivedMP3File(notification: Notification) {
@@ -67,7 +81,7 @@ final class MainViewModel {
         }
     }
 
-    func addNewItem(_ destinationURL: URL) {
+    private func addNewItem(_ destinationURL: URL) {
         Task { @MainActor in
             do {
                 let item = prepareNewItem(destinationURL)

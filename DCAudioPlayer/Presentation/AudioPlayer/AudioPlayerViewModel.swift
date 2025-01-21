@@ -35,29 +35,29 @@ final class AudioPlayerViewModel {
     }
 
     private func loadLastPosition() {
-        DispatchQueue.main.asyncAfter(wallDeadline: .now() + 0.1) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             guard let self, !self.audioManager.isPlaying else { return }
-//            self.audioManager.seekTo(audioFileStatus.lastPositionAtSecond)
+            self.audioManager.seekTo(self.lastPosition)
         }
     }
 
     private func saveLastPosition(_ position: Double) {
-//        try? useCase.updateLastPosition(currentTrack, lastPosition: position)
+        Task {
+            try? await useCase.updateLastPosition(currentTrack.uuid, lastPosition: position)
+        }
     }
 }
 // MARK: Public var
 extension AudioPlayerViewModel {
     func audioFileStatus() {
-
-//        Task { @MainActor in
-//            do {
-//                let status = try await useCase.getAudioStatus(currentTrack.uuid)
-//                return status ?? .empty
-//            } catch {
-//                handleError(error)
-//                return .empty
-//            }
-//        }
+        Task {
+            do {
+                let status = try await useCase.getAudioStatus(currentTrack.uuid)
+                print("status: \(status)")
+            } catch {
+                handleError(error)
+            }
+        }
     }
 
     var imageFavorite: Image {
@@ -66,16 +66,17 @@ extension AudioPlayerViewModel {
         "heart"
         return Image(systemName: name)
     }
-    var coverUrl: URL? {
-        currentTrack.audioCoverURL
+
+    var coverAudio: UIImage? {
+        UIImage(contentsOfFile: currentTrack.cover)
     }
 
     var title: String {
         currentTrack.title
     }
 
-    var authorAvatarUrl: URL? {
-        currentTrack.authorImageURL
+    var authorAvatar: UIImage? {
+        UIImage(contentsOfFile: currentTrack.authorAvatar)
     }
 
     var author: String {
@@ -119,7 +120,13 @@ extension AudioPlayerViewModel {
 // MARK: Public methods
 extension AudioPlayerViewModel {
     func setFavorite() {
-//        try? useCase.setFavorite(audioManager.currentTrack)
+        Task {
+            do {
+                try await useCase.setFavorite(audioManager.currentTrack.uuid)
+            } catch {
+                handleError(error)
+            }
+        }
     }
 
     func backward() {

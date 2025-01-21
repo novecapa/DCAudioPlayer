@@ -32,7 +32,6 @@ struct AudioPlayerView: View {
                             .padding(.leading, 8)
                     }
                     Spacer()
-                    /**
                     Button {
                         viewModel.setFavorite()
                     } label: {
@@ -43,30 +42,28 @@ struct AudioPlayerView: View {
                             .tint(.pink)
                             .padding(.trailing, 8)
                     }
-                    */
                 }
                 .frame(height: 50)
 
                 ScrollView(showsIndicators: false) {
-//                    KFImage(viewModel.coverUrl)
-//                        .placeholder {
-//                            Image(systemName: "airpods.max")
-//                                .resizable()
-//                                .scaledToFit()
-//                                .padding(80)
-//                                .frame(height: geometry.size.width)
-//                                .background(.gray.opacity(0.4))
-//                                .foregroundColor(.pink)
-//                                .clipped()
-//                                .cornerRadius(8)
-//                        }
-//                        .resizable()
-//                        .scaledToFit()
-//                        .frame(height: geometry.size.width)
-//                        .background(.gray.opacity(0.4))
-//                        .clipped()
-//                        .cornerRadius(8)
-//                        .padding(.top, 8)
+                    if let image = viewModel.coverAudio {
+                        Image(uiImage: image)
+                            .scaledToFit()
+                            .frame(height: geometry.size.width)
+                            .background(.gray.opacity(0.4))
+                            .clipped()
+                            .cornerRadius(8)
+                            .padding(.top, 8)
+                    } else {
+                        Image(systemName: "airpods.max")
+                            .resizable()
+                            .padding(80)
+                            .frame(height: geometry.size.width)
+                            .background(.gray.opacity(0.4))
+                            .foregroundColor(.pink)
+                            .clipped()
+                            .cornerRadius(8)
+                    }
 
                     VStack(alignment: .leading) {
                         Text(viewModel.title)
@@ -74,21 +71,21 @@ struct AudioPlayerView: View {
                             .lineLimit(2)
                             .padding(.top, 16)
                         HStack {
-//                            KFImage(viewModel.authorAvatarUrl)
-//                                .placeholder {
-//                                    Image(systemName: "person.circle.fill")
-//                                        .resizable()
-//                                        .scaledToFit()
-//                                        .clipShape(Circle())
-//                                        .frame(width: 40, height: 40)
-//                                }
-//                                .resizable()
-//                                .scaledToFit()
-//                                .clipShape(Circle())
-//                                .frame(width: 40, height: 40)
-//                            Text(viewModel.author)
-//                                .font(.headline)
-//                                .lineLimit(2)
+                            if let image = viewModel.authorAvatar {
+                                Image(uiImage: image)
+                                    .scaledToFit()
+                                    .clipShape(Circle())
+                                    .frame(width: 40, height: 40)
+                            } else {
+                                Image(systemName: "person.circle.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .clipShape(Circle())
+                                    .frame(width: 40, height: 40)
+                            }
+                            Text(viewModel.author)
+                                .font(.headline)
+                                .lineLimit(2)
                         }
                         .padding(.top, 8)
                     }
