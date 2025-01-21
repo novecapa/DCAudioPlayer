@@ -9,8 +9,13 @@
 import Foundation
 
 final class AudioPlayerViewBuilderMock: AudioPlayerViewBuilderProtocol {
-	func build() -> AudioPlayerView {
-        let viewModel = AudioPlayerViewModel()
+    func build( _ manager: AudioPlayerManager,
+                audioFile: AudioFileEntity = .empty) -> AudioPlayerView {
+        let persistentContainer = SwiftDataContainer(isStoredInMemoryOnly: false)
+        let database = AudioFileDatabase(databaseManager: persistentContainer)
+        let repository = AudioFilesRepository(audioFilesDatabse: database)
+        let useCase = AudioFileUseCase(repository: repository)
+        let viewModel = AudioPlayerViewModel(useCase: useCase, audioPlayer: manager)
         let view = AudioPlayerView(viewModel: viewModel)
         return view
 	}

@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 final class AudioFileDatabase: AudioFileDatabaseProtocol {
-    
+
     private let databaseManager: SwiftDataContainerProtocol
     init(databaseManager: SwiftDataContainerProtocol) {
         self.databaseManager = databaseManager
@@ -56,7 +56,7 @@ final class AudioFileDatabase: AudioFileDatabaseProtocol {
         )
         let results = try databaseManager.container.mainContext.fetch(fetchDescriptor)
         guard let audioFile = results.first else {
-            throw SwiftDataError.errorSearch
+            throw SwiftDataError.errorSearch("Error guardando como favorito".localized())
         }
         audioFile.isFavorite.toggle()
         audioFile.favoriteAtDate = currentMillis
@@ -72,7 +72,7 @@ final class AudioFileDatabase: AudioFileDatabaseProtocol {
         )
         let results = try databaseManager.container.mainContext.fetch(fetchDescriptor)
         guard let audioFile = results.first else {
-            throw SwiftDataError.errorSearch
+            throw SwiftDataError.errorSearch("Error en la búsqueda".localized())
         }
         audioFile.lastPositionAtSecond = lastPosition
         audioFile.lastPlayingAtDate = currentMillis
@@ -95,8 +95,9 @@ final class AudioFileDatabase: AudioFileDatabaseProtocol {
             predicate: #Predicate { $0.uuid == audioFileUUID },
             sortBy: [SortDescriptor<SDAudioFile>(\.uuid)]
         )
-        if let file = try databaseManager.container.mainContext.fetch(fetchDescriptor).first {
-            databaseManager.container.mainContext.delete(file)
+        guard let file = try databaseManager.container.mainContext.fetch(fetchDescriptor).first else {
+            throw SwiftDataError.errorSearch("Error eliminando el archivo".localized())
         }
+        databaseManager.container.mainContext.delete(file)
     }
 }

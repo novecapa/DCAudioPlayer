@@ -55,6 +55,8 @@ fileprivate extension AudioFileEntity {
             publishDate: self.publishDate,
             duration: self.duration,
             cover: self.cover,
+            filePath: self.filePath,
+            fileName: self.fileName,
             dateCreated: self.dateCreated
         )
     }

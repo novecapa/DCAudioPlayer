@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-class SDAudioFile {
+final class SDAudioFile {
     @Attribute(.unique) var uuid: String
     var title: String
     var desc: String
@@ -20,8 +20,8 @@ class SDAudioFile {
     var duration: Double
     var cover: String
 
-    var filePath: String = ""
-    var fileName: String = ""
+    var filePath: String
+    var fileName: String
 
     var isFavorite: Bool = false
     var favoriteAtDate: Double = 0
@@ -46,6 +46,8 @@ class SDAudioFile {
         publishDate: String,
         duration: Double,
         cover: String,
+        filePath: String,
+        fileName: String,
         dateCreated: Double
     ) {
         self.uuid = uuid
@@ -57,6 +59,8 @@ class SDAudioFile {
         self.publishDate = publishDate
         self.duration = duration
         self.cover = cover
+        self.filePath = filePath
+        self.fileName = fileName
         self.dateCreated = dateCreated
     }
 }

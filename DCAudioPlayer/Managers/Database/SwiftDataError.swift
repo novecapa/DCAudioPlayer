@@ -8,8 +8,8 @@
 import Foundation
 
 enum SwiftDataError: Error {
-    case errorSave
-    case errorFetch
-    case errorSearch
-    case errorDelete
+    case errorSave(String)
+    case errorFetch(String)
+    case errorSearch(String)
+    case errorDelete(String)
 }

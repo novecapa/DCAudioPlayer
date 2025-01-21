@@ -10,11 +10,20 @@ import SwiftUI
 
 struct MainView: View {
 
-    @State var viewModel: MainViewModel
+    @State private var selectedTab = 0
+
+    @State var presentPlayer: Bool = false
+    @State private var audioPlayer: AudioPlayerManager
+    @State private var viewModel: MainViewModel
+    init(audioPlayer: AudioPlayerManager = AudioPlayerManager(),
+         viewModel: MainViewModel) {
+        self.audioPlayer = audioPlayer
+        self.viewModel = viewModel
+    }
 
     var body: some View {
         ZStack {
-            TabView {
+            TabView(selection: $selectedTab) {
                 AudioListViewBuilder().build()
                     .tabItem {
                         Image(systemName: "airpods.max")
@@ -22,6 +31,21 @@ struct MainView: View {
                     }
                     .tag(0)
             }
+            .environment(audioPlayer)
+            if audioPlayer.isPlaying && selectedTab != 1 {
+                VStack {
+                    Spacer()
+                    AudioPlayerMiniView(audioPlayer: audioPlayer)
+                        .background(.white)
+                        .onTapGesture {
+                            presentPlayer.toggle()
+                        }
+                }
+                .padding(.bottom, 44)
+            }
+        }
+        .fullScreenCover(isPresented: $presentPlayer) {
+            AudioPlayerViewBuilder().build(audioPlayer)
         }
     }
 }

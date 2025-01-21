@@ -9,6 +9,13 @@ import SwiftUI
 
 @main
 struct DCAudioPlayerApp: App {
+
+    init() {
+        let utils: UtilsProtocol = Utils()
+        print("Documents path: \(utils.getDocumentsDirectory.path)")
+        utils.createDirectory(directoryName: Utils.Constants.audioFolder)
+    }
+
     var body: some Scene {
         WindowGroup {
             MainViewBuilder().build()

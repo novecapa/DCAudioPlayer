@@ -9,4 +9,150 @@
 import SwiftUI
 
 @Observable
-final class AudioPlayerViewModel {}
+final class AudioPlayerViewModel {
+
+    private let useCase: AudioFileUseCase
+    private let audioManager: AudioPlayerManager
+    private let audioFile: AudioFileEntity
+    init(useCase: AudioFileUseCase,
+         audioPlayer: AudioPlayerManager,
+         audioFile: AudioFileEntity = .empty) {
+        self.useCase = useCase
+        self.audioManager = audioPlayer
+        self.audioFile = audioFile == .empty ?
+        audioPlayer.currentTrack :
+        audioFile
+        self.audioManager.delegate = self
+        loadLastPosition()
+    }
+
+    private func handleError(_ error: Error) {
+        print("Error: \(error.localizedDescription)")
+    }
+
+    private var currentTrack: AudioFileEntity {
+        audioManager.currentTrack
+    }
+
+    private func loadLastPosition() {
+        DispatchQueue.main.asyncAfter(wallDeadline: .now() + 0.1) { [weak self] in
+            guard let self, !self.audioManager.isPlaying else { return }
+//            self.audioManager.seekTo(audioFileStatus.lastPositionAtSecond)
+        }
+    }
+
+    private func saveLastPosition(_ position: Double) {
+//        try? useCase.updateLastPosition(currentTrack, lastPosition: position)
+    }
+}
+// MARK: Public var
+extension AudioPlayerViewModel {
+    func audioFileStatus() {
+
+//        Task { @MainActor in
+//            do {
+//                let status = try await useCase.getAudioStatus(currentTrack.uuid)
+//                return status ?? .empty
+//            } catch {
+//                handleError(error)
+//                return .empty
+//            }
+//        }
+    }
+
+    var imageFavorite: Image {
+        let name = audioFile.isFavorite == true ?
+        "heart.fill" :
+        "heart"
+        return Image(systemName: name)
+    }
+    var coverUrl: URL? {
+        currentTrack.audioCoverURL
+    }
+
+    var title: String {
+        currentTrack.title
+    }
+
+    var authorAvatarUrl: URL? {
+        currentTrack.authorImageURL
+    }
+
+    var author: String {
+        currentTrack.author
+    }
+
+    var currentPosition: Double {
+        get {
+            audioManager.currentPosition
+        }
+        set {
+            audioManager.currentPosition = newValue
+            saveLastPosition(newValue)
+        }
+    }
+
+    var duration: Double {
+        audioManager.duration
+    }
+
+    var timerInit: String {
+        audioManager.currentTime.toTimming
+    }
+
+    var countDownTime: String {
+        audioManager.countDownTime
+    }
+
+    var description: String {
+        currentTrack.desc
+    }
+
+    var imagePlayPause: Image {
+        Image(systemName: audioManager.isPlaying ? "pause.fill" : "play.fill")
+    }
+
+    var lastPosition: Double {
+        audioFile.lastPositionAtSecond
+    }
+}
+// MARK: Public methods
+extension AudioPlayerViewModel {
+    func setFavorite() {
+//        try? useCase.setFavorite(audioManager.currentTrack)
+    }
+
+    func backward() {
+        audioManager.backward()
+    }
+
+    func forward() {
+        audioManager.forward()
+    }
+
+    func seekTo(_ position: Double) {
+        audioManager.seekTo(position)
+        saveLastPosition(position)
+    }
+
+    func loadAudio() {
+        audioManager.loadAudio(currentTrack: audioFile)
+    }
+
+    func playPause() {
+        if audioManager.isPlaying {
+            audioManager.pause()
+        } else {
+            audioManager.play()
+        }
+    }
+}
+
+// MARK: AudioPlayerManagerProtocol
+extension AudioPlayerViewModel: AudioPlayerManagerProtocol {
+    func audioStateChanged() {}
+
+    func audioTimeChanged(_ position: Double) {
+        saveLastPosition(position)
+    }
+}
