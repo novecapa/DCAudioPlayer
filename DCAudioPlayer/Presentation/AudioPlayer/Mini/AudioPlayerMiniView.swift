@@ -20,7 +20,7 @@ struct AudioPlayerMiniView: View {
                 Button {
                     audioPlayer.backward()
                 } label: {
-                    Image(systemName: "gobackward.15")
+                    Image(systemName: .backward(.secondsBackward))
                         .font(.largeTitle)
                         .foregroundStyle(.pink)
                 }
@@ -36,7 +36,7 @@ struct AudioPlayerMiniView: View {
                 Button {
                     audioPlayer.forward()
                 } label: {
-                    Image(systemName: "goforward.15")
+                    Image(systemName: .forward(.secondsForward))
                         .font(.largeTitle)
                         .foregroundStyle(.pink)
                 }

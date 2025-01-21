@@ -34,7 +34,7 @@ struct AudioListView: View {
                     Text("Aún no tienes ningún archivo 🫠".localized())
                         .font(.headline)
                         .foregroundStyle(.black)
-                        .padding(.top, .paddingMedium)
+                        .padding(.top, .paddingM)
                 }
                 Spacer()
             } else {
@@ -56,7 +56,7 @@ struct AudioListView: View {
                     viewModel.getAudioList()
                 }
                 .scrollDismissesKeyboard(.interactively)
-                .padding(.top, .paddingRegular)
+                .padding(.top, .paddingL)
             }
         }
         .onAppear {

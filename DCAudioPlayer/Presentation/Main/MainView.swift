@@ -44,6 +44,15 @@ struct MainView: View {
                 .padding(.bottom, 44)
             }
         }
+        .sheet(isPresented: $viewModel.showAudioDetails,
+               onDismiss: {
+            print("onDismiss")
+        }, content: {
+            if let url = viewModel.filePath {
+                EditAudioInfoViewBuilder().build(fileURL: url,
+                                                 useCase: viewModel.useCase)
+            }
+        })
         .fullScreenCover(isPresented: $presentPlayer) {
             AudioPlayerViewBuilder().build(audioPlayer)
         }

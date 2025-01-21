@@ -10,6 +10,13 @@ import SwiftUI
 
 struct AudioPlayerView: View {
 
+    enum Constants {
+        static let iconSize: CGFloat = 24
+        static let avatarSize: CGFloat = 40
+        static let customHeight: CGFloat = 50
+        static let cornerRadius: CGFloat = 8
+    }
+
     @Environment(\.dismiss) var dismiss
 
     private var viewModel: AudioPlayerViewModel
@@ -24,12 +31,13 @@ struct AudioPlayerView: View {
                     Button {
                         dismiss()
                     } label: {
-                        Image(systemName: "chevron.down")
+                        Image(systemName: .arrowDown)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 24, height: 24)
+                            .frame(width: Constants.iconSize,
+                                   height: Constants.iconSize)
                             .tint(.pink)
-                            .padding(.leading, 8)
+                            .padding(.leading, .paddingM)
                     }
                     Spacer()
                     Button {
@@ -38,12 +46,13 @@ struct AudioPlayerView: View {
                         viewModel.imageFavorite
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 24, height: 24)
+                            .frame(width: Constants.iconSize,
+                                   height: Constants.iconSize)
                             .tint(.pink)
-                            .padding(.trailing, 8)
+                            .padding(.trailing, .paddingM)
                     }
                 }
-                .frame(height: 50)
+                .frame(height: Constants.customHeight)
 
                 ScrollView(showsIndicators: false) {
                     if let image = viewModel.coverAudio {
@@ -52,42 +61,44 @@ struct AudioPlayerView: View {
                             .frame(height: geometry.size.width)
                             .background(.gray.opacity(0.4))
                             .clipped()
-                            .cornerRadius(8)
-                            .padding(.top, 8)
+                            .cornerRadius(Constants.cornerRadius)
+                            .padding(.top, .paddingM)
                     } else {
-                        Image(systemName: "airpods.max")
+                        Image(systemName: .airpodsMax)
                             .resizable()
-                            .padding(80)
+                            .padding(.custom(80))
                             .frame(height: geometry.size.width)
                             .background(.gray.opacity(0.4))
                             .foregroundColor(.pink)
                             .clipped()
-                            .cornerRadius(8)
+                            .cornerRadius(Constants.cornerRadius)
                     }
 
                     VStack(alignment: .leading) {
                         Text(viewModel.title)
                             .font(.title)
                             .lineLimit(2)
-                            .padding(.top, 16)
+                            .padding(.top, .paddingL)
                         HStack {
                             if let image = viewModel.authorAvatar {
                                 Image(uiImage: image)
                                     .scaledToFit()
                                     .clipShape(Circle())
-                                    .frame(width: 40, height: 40)
+                                    .frame(width: Constants.avatarSize,
+                                           height: Constants.avatarSize)
                             } else {
-                                Image(systemName: "person.circle.fill")
+                                Image(systemName: .userCircle)
                                     .resizable()
                                     .scaledToFit()
                                     .clipShape(Circle())
-                                    .frame(width: 40, height: 40)
+                                    .frame(width: Constants.avatarSize,
+                                           height: Constants.avatarSize)
                             }
                             Text(viewModel.author)
                                 .font(.headline)
                                 .lineLimit(2)
                         }
-                        .padding(.top, 8)
+                        .padding(.top, .paddingM)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -95,7 +106,7 @@ struct AudioPlayerView: View {
                         Button {
                             viewModel.backward()
                         } label: {
-                            Image(systemName: "gobackward.15")
+                            Image(systemName: .backward(.secondsBackward))
                                 .font(.largeTitle)
                                 .foregroundStyle(.pink)
                         }
@@ -111,12 +122,12 @@ struct AudioPlayerView: View {
                         Button {
                             viewModel.forward()
                         } label: {
-                            Image(systemName: "goforward.15")
+                            Image(systemName: .forward(.secondsForward))
                                 .font(.largeTitle)
                                 .foregroundStyle(.pink)
                         }
                     }
-                    .padding(.top, 24)
+                    .padding(.top, .paddingXL)
 
                     VStack {
                         TimeSlider(value: Binding(
@@ -132,18 +143,18 @@ struct AudioPlayerView: View {
                             Spacer()
                             Text(viewModel.countDownTime)
                         }
-                    }.padding(.top, 16)
+                    }.padding(.top, .paddingL)
 
                     VStack(alignment: .leading) {
                         Text(.init(viewModel.description))
                             .font(.subheadline)
                             .multilineTextAlignment(.leading)
                     }
-                    .padding(.top, 24)
+                    .padding(.top, .paddingXL)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, .paddingL)
             .onAppear {
                 viewModel.loadAudio()
             }

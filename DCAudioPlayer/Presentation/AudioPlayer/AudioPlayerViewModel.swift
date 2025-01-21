@@ -53,7 +53,7 @@ extension AudioPlayerViewModel {
         Task {
             do {
                 let status = try await useCase.getAudioStatus(currentTrack.uuid)
-                print("status: \(status)")
+                print("status: \(status?.title ?? "")")
             } catch {
                 handleError(error)
             }

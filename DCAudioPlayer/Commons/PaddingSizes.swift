@@ -8,27 +8,33 @@
 import Foundation
 
 enum Paddings {
-    case light
-    case regular
-    case medium
-    case heavy
+    case paddingS
+    case paddingM
+    case paddingL
+    case paddingXL
+    case custom(CGFloat)
 
     var size: CGFloat {
         switch self {
-        case .light:
+        case .paddingS:
             return 6
-        case .regular:
+        case .paddingM:
             return 8
-        case .medium:
+        case .paddingL:
             return 16
-        case .heavy:
+        case .paddingXL:
             return 24
+        case .custom(let value):
+            return value
         }
     }
 }
 extension CGFloat {
-    static var paddingLight: CGFloat { Paddings.light.size }
-    static var paddingRegular: CGFloat { Paddings.regular.size }
-    static var paddingMedium: CGFloat { Paddings.medium.size }
-    public static var paddingHeavy: CGFloat { Paddings.heavy.size }
+    static var paddingS: CGFloat { Paddings.paddingS.size }
+    static var paddingM: CGFloat { Paddings.paddingM.size }
+    static var paddingL: CGFloat { Paddings.paddingL.size }
+    static var paddingXL: CGFloat { Paddings.paddingXL.size }
+    static func custom(_ value: CGFloat) -> CGFloat {
+        Paddings.custom(value).size
+    }
 }
