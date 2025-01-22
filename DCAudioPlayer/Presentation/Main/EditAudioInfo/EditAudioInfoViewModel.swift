@@ -12,6 +12,14 @@ import SwiftUI
 @Observable
 final class EditAudioInfoViewModel {
 
+    // MARK: Public
+    var title: String = ""
+    var desc: String = ""
+    var author: String = ""
+    var coverImagePath: String = ""
+    var authorImagePath: String = ""
+
+    // MARK: Alert message
     var alertMessage: String = "" {
         didSet {
             if !alertMessage.isEmpty {
@@ -21,6 +29,7 @@ final class EditAudioInfoViewModel {
     }
     var showAlert: Bool = false
 
+    // MARK: Private properties
     private let fileURL: URL
     private let useCase: AudioFileUseCaseProtocol
     private let utils: UtilsProtocol
@@ -54,13 +63,11 @@ final class EditAudioInfoViewModel {
             if fileManager.fileExists(atPath: destinationURL.path) {
                 try fileManager.removeItem(at: destinationURL)
             }
-
             try fileManager.moveItem(at: fileURL, to: destinationURL)
 
-            // Save item
             addNewItem(destinationURL)
         } catch {
-            print("Error al copiar el archivo: \(error)")
+            handleError(error)
         }
     }
 
@@ -86,15 +93,15 @@ final class EditAudioInfoViewModel {
 
     var previewAudioData: AudioFileEntity {
         AudioFileEntity(
-            uuid: UUID().uuidString,
-            title: "",
-            desc: "",
-            author: "",
+            uuid: "",
+            title: self.title,
+            desc: self.desc,
+            author: self.author,
             user: "",
-            authorAvatar: "",
+            authorAvatar: self.authorImagePath,
             publishDate: "",
             duration: audioDuration,
-            cover: "",
+            cover: self.coverImagePath,
             filePath: "",
             fileName: audioName,
             isFavorite: false,
@@ -109,19 +116,18 @@ final class EditAudioInfoViewModel {
         )
     }
     func prepareNewItem(_ destinationURL: URL) -> AudioFileEntity {
-        let fileName = String(fileURL.lastPathComponent.split(separator: ".").first ?? "")
-        return AudioFileEntity(
+        AudioFileEntity(
             uuid: UUID().uuidString,
-            title: "",
-            desc: "",
-            author: "",
+            title: self.title,
+            desc: self.desc,
+            author: self.author,
             user: "",
-            authorAvatar: "",
+            authorAvatar: self.authorImagePath,
             publishDate: "",
             duration: audioDuration,
-            cover: "",
+            cover: self.coverImagePath,
             filePath: destinationURL.path,
-            fileName: fileName,
+            fileName: audioName,
             isFavorite: false,
             favoriteAtDate: 0,
             lastStartDate: 0,

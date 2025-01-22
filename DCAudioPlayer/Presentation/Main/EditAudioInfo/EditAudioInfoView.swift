@@ -39,7 +39,7 @@ struct EditAudioInfoView: View {
                                 .frame(width: 40, height: 40)
                                 .padding(.leading, 12)
                         } else {
-                            Image(systemName: "person.circle.fill")
+                            Image(systemName: .userCircle)
                                 .resizable()
                                 .scaledToFit()
                                 .clipShape(Circle())
@@ -72,7 +72,7 @@ struct EditAudioInfoView: View {
                     .cornerRadius(6)
                 }
                 Button {
-                    // TODO: --
+                    viewModel.saveFile()
                 } label: {
                     Text("Guardar".localized())
                         .foregroundStyle(.pink)
