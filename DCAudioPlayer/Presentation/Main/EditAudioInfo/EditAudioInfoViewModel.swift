@@ -14,8 +14,8 @@ final class EditAudioInfoViewModel {
 
     // MARK: Public
     var title: String = ""
-    var desc: String = ""
     var author: String = ""
+    var desc: String = ""
     var coverImagePath: String = ""
     var authorImagePath: String = ""
 

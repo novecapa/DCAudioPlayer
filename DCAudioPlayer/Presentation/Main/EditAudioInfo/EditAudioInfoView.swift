@@ -14,6 +14,7 @@ struct EditAudioInfoView: View {
         static let cornerRadius: CGFloat = 8
     }
 
+    @Environment(\.dismiss) var dismiss
     @State var viewModel: EditAudioInfoViewModel
 
     var body: some View {
@@ -47,13 +48,15 @@ struct EditAudioInfoView: View {
                                 .padding(.leading, 12)
                         }
                         VStack(alignment: .leading) {
-                            Text(viewModel.previewAudioData.title)
+                            TextField("Título".localized(),
+                                      text: $viewModel.title)
                                 .font(.headline)
                                 .multilineTextAlignment(.leading)
                                 .padding(.top, 12)
                                 .padding(.bottom, 6)
                                 .foregroundStyle(.black)
-                            Text(viewModel.previewAudioData.author)
+                            TextField("Autor".localized(),
+                                      text: $viewModel.author)
                                 .font(.subheadline)
                                 .lineLimit(2)
                                 .padding(.bottom, 8)
@@ -61,7 +64,7 @@ struct EditAudioInfoView: View {
                         }
                         .padding(.leading, 12)
                         Spacer()
-                        Text(viewModel.previewAudioData.duration.toTimming)
+                        Text(viewModel.audioDuration.toTimming)
                             .font(.subheadline)
                             .lineLimit(2)
                             .padding(.horizontal, 12)
@@ -70,17 +73,32 @@ struct EditAudioInfoView: View {
                     .frame(minHeight: 60)
                     .background(.gray.opacity(0.4))
                     .cornerRadius(6)
+                    VStack {
+                        HStack {
+                            TextField(text: $viewModel.desc,
+                                      axis: .vertical,
+                                      label: {
+                                Text("Descripción".localized())
+                            })
+                            .padding(12)
+                        }
+                        Spacer()
+                    }
+                    .background(.gray.opacity(0.4))
+                    .cornerRadius(6)
+                    .frame(minHeight: 80)
                 }
                 Button {
                     viewModel.saveFile()
+                    dismiss()
                 } label: {
                     Text("Guardar".localized())
                         .foregroundStyle(.pink)
-                        .frame(height: 40)
+                        .frame(height: 46)
                         .frame(maxWidth: .infinity)
                         .background(.gray.opacity(0.4))
                         .cornerRadius(6)
-                        .padding(.top, 12)
+                        .padding(.vertical, 12)
                 }
             }
         }

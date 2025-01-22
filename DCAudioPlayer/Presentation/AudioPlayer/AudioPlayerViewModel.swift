@@ -35,7 +35,7 @@ final class AudioPlayerViewModel {
     }
 
     private func loadLastPosition() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
             guard let self, !self.audioManager.isPlaying else { return }
             self.audioManager.seekTo(self.lastPosition)
         }
