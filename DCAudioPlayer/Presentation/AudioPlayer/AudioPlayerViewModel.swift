@@ -11,76 +11,69 @@ import SwiftUI
 @Observable
 final class AudioPlayerViewModel {
 
+    var audioFile: AudioFileEntity = .empty
+
     private let useCase: AudioFileUseCase
     private let audioManager: AudioPlayerManager
-    private let audioFile: AudioFileEntity
+    private let audioUuid: String
     init(useCase: AudioFileUseCase,
          audioPlayer: AudioPlayerManager,
-         audioFile: AudioFileEntity = .empty) {
+         audioUuid: String = "") {
         self.useCase = useCase
         self.audioManager = audioPlayer
-        self.audioFile = audioFile == .empty ?
-        audioPlayer.currentTrack :
-        audioFile
+        self.audioUuid = audioUuid
         self.audioManager.delegate = self
-        loadLastPosition()
     }
 
     private func handleError(_ error: Error) {
         print("Error: \(error.localizedDescription)")
     }
 
-    private var currentTrack: AudioFileEntity {
-        audioManager.currentTrack
-    }
-
     private func loadLastPosition() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             guard let self, !self.audioManager.isPlaying else { return }
-            self.audioManager.seekTo(self.lastPosition)
+            Task {
+                await self.audioFileStatus()
+                await MainActor.run {
+                    self.audioManager.seekTo(self.audioFile.lastPositionAtSecond)
+                }
+            }
         }
     }
 
     private func saveLastPosition(_ position: Double) {
         Task {
-            try? await useCase.updateLastPosition(currentTrack.uuid, lastPosition: position)
+            try? await useCase.updateLastPosition(audioFile.uuid, lastPosition: position)
         }
     }
 }
 // MARK: Public var
 extension AudioPlayerViewModel {
-    func audioFileStatus() {
-        Task {
-            do {
-                let status = try await useCase.getAudioStatus(currentTrack.uuid)
-                print("status: \(status?.title ?? "")")
-            } catch {
-                handleError(error)
-            }
+    func audioFileStatus() async {
+        guard let result = try? await useCase.getAudioStatus(audioFile.uuid) else {
+            return
         }
+        audioFile = result
     }
 
     var imageFavorite: Image {
-        let name = audioFile.isFavorite == true ?
-        "heart.fill" :
-        "heart"
-        return Image(systemName: name)
+        Image(systemName: audioFile.isFavorite ? "heart.fill" : "heart")
     }
 
     var coverAudio: UIImage? {
-        UIImage(contentsOfFile: currentTrack.cover)
+        UIImage(contentsOfFile: audioFile.cover)
     }
 
     var title: String {
-        currentTrack.title
+        audioFile.title
     }
 
     var authorAvatar: UIImage? {
-        UIImage(contentsOfFile: currentTrack.authorAvatar)
+        UIImage(contentsOfFile: audioFile.authorAvatar)
     }
 
     var author: String {
-        currentTrack.author
+        audioFile.author
     }
 
     var currentPosition: Double {
@@ -106,15 +99,11 @@ extension AudioPlayerViewModel {
     }
 
     var description: String {
-        currentTrack.desc
+        audioFile.desc
     }
 
     var imagePlayPause: Image {
         Image(systemName: audioManager.isPlaying ? "pause.fill" : "play.fill")
-    }
-
-    var lastPosition: Double {
-        audioFile.lastPositionAtSecond
     }
 }
 // MARK: Public methods
@@ -122,7 +111,8 @@ extension AudioPlayerViewModel {
     func setFavorite() {
         Task {
             do {
-                try await useCase.setFavorite(audioManager.currentTrack.uuid)
+                try await useCase.setFavorite(audioFile.uuid)
+                await audioFileStatus()
             } catch {
                 handleError(error)
             }
@@ -143,7 +133,24 @@ extension AudioPlayerViewModel {
     }
 
     func loadAudio() {
-        audioManager.loadAudio(currentTrack: audioFile)
+        Task {
+            do {
+                if audioUuid.isEmpty {
+                    audioFile = audioManager.currentTrack
+                    return
+                }
+                guard let res = try await useCase.getAudioStatus(audioUuid) else {
+                    return
+                }
+                self.audioFile = res
+                await MainActor.run {
+                    self.audioManager.loadAudio(currentTrack: audioFile)
+                }
+                self.loadLastPosition()
+            } catch {
+                handleError(error)
+            }
+        }
     }
 
     func playPause() {

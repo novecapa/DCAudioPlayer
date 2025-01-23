@@ -9,8 +9,7 @@
 import Foundation
 
 final class AudioPlayerViewBuilderMock: AudioPlayerViewBuilderProtocol {
-    func build( _ manager: AudioPlayerManager,
-                audioFile: AudioFileEntity = .empty) -> AudioPlayerView {
+    func build( _ manager: AudioPlayerManager, audioUuid: String = "") -> AudioPlayerView {
         let persistentContainer = SwiftDataContainer(isStoredInMemoryOnly: false)
         let database = AudioFileDatabase(databaseManager: persistentContainer)
         let repository = AudioFilesRepository(audioFilesDatabse: database)

@@ -18,8 +18,6 @@ struct AudioFileEntity: Equatable {
     let publishDate: String
     let duration: Double
     let cover: String
-
-    let filePath: String
     let fileName: String
 
     let isFavorite: Bool
@@ -48,7 +46,6 @@ extension AudioFileEntity {
         publishDate: "",
         duration: 0,
         cover: "",
-        filePath: "",
         fileName: "",
         isFavorite: false,
         favoriteAtDate: 0,
@@ -71,7 +68,6 @@ extension AudioFileEntity {
         publishDate: "",
         duration: 0,
         cover: "https://i.ytimg.com/vi_webp/BZN3bhZ8ixM/maxresdefault.webp",
-        filePath: "",
         fileName: "",
         isFavorite: false,
         favoriteAtDate: 0,

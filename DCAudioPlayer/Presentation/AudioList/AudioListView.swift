@@ -66,10 +66,15 @@ struct AudioListView: View {
                content: {
             viewModel.alert
         })
-        .fullScreenCover(isPresented: $viewModel.showPlayer, content: {
-            if let selectedAudio = viewModel.selectedAudio {
-                AudioPlayerViewBuilder().build(audioPlayer,
-                                               audioFile: selectedAudio)
+        .fullScreenCover(
+            isPresented: $viewModel.showPlayer,
+            content: {
+                if let selectedAudio = viewModel.selectedAudio {
+                    AudioPlayerViewBuilder()
+                        .build(
+                            audioPlayer,
+                            audioUuid: selectedAudio.uuid
+                        )
             }
         })
     }

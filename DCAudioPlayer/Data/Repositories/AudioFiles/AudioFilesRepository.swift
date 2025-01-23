@@ -35,7 +35,7 @@ final class AudioFilesRepository: AudioFilesRepositoryProtocol {
     }
 
     func getAudioStatus(_ audioFileUUID: String) async throws -> AudioFileEntity? {
-        try await audioFilesDatabse.getAudioStatus(audioFileUUID).map { $0.toEntity }
+        try await audioFilesDatabse.getAudioStatus(audioFileUUID)?.toEntity
     }
 
     func deleteAudio(_ audioFileUUID: String) async throws {
@@ -55,7 +55,6 @@ fileprivate extension AudioFileEntity {
             publishDate: self.publishDate,
             duration: self.duration,
             cover: self.cover,
-            filePath: self.filePath,
             fileName: self.fileName,
             dateCreated: self.dateCreated
         )
@@ -74,7 +73,6 @@ fileprivate extension SDAudioFile {
             publishDate: self.publishDate,
             duration: self.duration,
             cover: self.cover,
-            filePath: self.filePath,
             fileName: self.fileName,
             isFavorite: self.isFavorite,
             favoriteAtDate: self.favoriteAtDate,

@@ -57,14 +57,11 @@ final class EditAudioInfoViewModel {
     func saveFile() {
         do {
             let fileManager = utils.getFileManager
-            let fileName = fileURL.lastPathComponent
             let destinationURL = utils.getMP3Path(fileName)
-
             if fileManager.fileExists(atPath: destinationURL.path) {
                 try fileManager.removeItem(at: destinationURL)
             }
             try fileManager.moveItem(at: fileURL, to: destinationURL)
-
             addNewItem(destinationURL)
         } catch {
             handleError(error)
@@ -83,12 +80,13 @@ final class EditAudioInfoViewModel {
     }
 
     var audioDuration: TimeInterval {
-        let audioPlayer = try? AVAudioPlayer(contentsOf: fileURL)
+        let fileUrl = utils.getMP3Path(fileName)
+        let audioPlayer = try? AVAudioPlayer(contentsOf: fileUrl)
         return audioPlayer?.duration ?? 0
     }
 
-    var audioName: String {
-        String(fileURL.lastPathComponent.split(separator: ".").first ?? "")
+    var fileName: String {
+        String(fileURL.lastPathComponent)
     }
 
     var previewAudioData: AudioFileEntity {
@@ -102,8 +100,7 @@ final class EditAudioInfoViewModel {
             publishDate: "",
             duration: audioDuration,
             cover: self.coverImagePath,
-            filePath: "",
-            fileName: audioName,
+            fileName: fileName,
             isFavorite: false,
             favoriteAtDate: 0,
             lastStartDate: 0,
@@ -126,8 +123,7 @@ final class EditAudioInfoViewModel {
             publishDate: "",
             duration: audioDuration,
             cover: self.coverImagePath,
-            filePath: destinationURL.path,
-            fileName: audioName,
+            fileName: fileName,
             isFavorite: false,
             favoriteAtDate: 0,
             lastStartDate: 0,
