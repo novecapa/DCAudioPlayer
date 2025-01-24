@@ -8,16 +8,21 @@
 import PhotosUI
 import SwiftUI
 
-// MARK: - 
+// MARK: - ImageState
 enum ImageState {
     case empty
-    case loading
     case success(Image)
     case failure(Error)
 }
 
-// MARK: -
-struct ProfileImage: Transferable {
+// MARK: - ImageStyle
+enum ImageStyle {
+    case square
+    case circular
+}
+
+// MARK: - TransferableImage
+struct TransferableImage: Transferable {
     let image: UIImage
 
     static var transferRepresentation: some TransferRepresentation {
@@ -25,92 +30,117 @@ struct ProfileImage: Transferable {
             guard let uiImage = UIImage(data: data) else {
                 throw NSError(domain: "Invalid Image Data", code: -1, userInfo: nil)
             }
-            return ProfileImage(image: uiImage)
+            return TransferableImage(image: uiImage)
         }
     }
 }
 
-// MARK: -
-struct ProfileImageView: View {
+// MARK: - SelectableImageView
+struct SelectableImageView: View {
     let imageState: ImageState
+    let imageStyle: ImageStyle
 
     var body: some View {
         switch imageState {
         case .success(let image):
-            image
-                .resizable()
-        case .loading:
-            ProgressView()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            image.resizable()
+                .frame(minWidth: 40, minHeight: 40)
         case .empty:
-            Image(systemName: "person.fill")
-                .font(.system(size: 40))
-                .foregroundColor(.white)
+            let image = Image(systemName: imageStyle == .circular ? .userCircle : .airpodsMax)
+            if imageStyle == .circular {
+                image
+                .resizable()
+                .frame(maxWidth: 40, maxHeight: 40)
+                .foregroundColor(.black)
+            } else {
+                image
+                .resizable()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(100)
+                .foregroundColor(.black)
+            }
         case .failure:
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 40))
+                .frame(minWidth: 40, minHeight: 40)
                 .foregroundColor(.white)
         }
     }
 }
 
-// MARK: -
-struct CircularProfileImage: View {
+// MARK: - SelectableImage
+struct SelectableImage: View {
     let imageState: ImageState
+    let imageStyle: ImageStyle
 
     var body: some View {
-        ProfileImageView(imageState: imageState)
-            .scaledToFill()
-            .clipShape(Circle())
-            .frame(width: 100, height: 100)
-            .background {
-                Circle().fill(
-                    LinearGradient(
-                        colors: [.yellow, .orange],
-                        startPoint: .top,
-                        endPoint: .bottom
+        let image = SelectableImageView(imageState: imageState, imageStyle: imageStyle)
+        if imageStyle == .circular {
+            image
+                .scaledToFill()
+                .clipShape(Circle())
+                .background {
+                    Circle().fill(
+                        LinearGradient(
+                            colors: [.white],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
                     )
-                )
-            }
-            .shadow(radius: 4)
+                }
+                .shadow(radius: 4)
+        } else {
+            image
+                .aspectRatio(1, contentMode: .fit)
+                .shadow(radius: 4)
+        }
     }
 }
 
-// MARK: -
-struct EditableCircularProfileImage: View {
+// MARK: - EditableImage
+struct EditableImage: View {
 
-    @State private var imageState: ImageState = .empty
+    @State private var imageState: ImageState = .empty {
+        didSet {
+            switch imageState {
+            case .success(let image):
+                return selectedImage(image)
+            default:
+                break
+            }
+        }
+    }
     @State private var imageSelection: PhotosPickerItem?
+    let imageStyle: ImageStyle
+    let selectedImage: (Image) -> Void
 
     var body: some View {
-        CircularProfileImage(imageState: imageState)
-            .overlay(alignment: .bottomTrailing) {
-                PhotosPicker(
-                    selection: $imageSelection,
-                    matching: .images,
-                    photoLibrary: .shared()
-                ) {
-                    Image(systemName: "pencil.circle.fill")
-                        .symbolRenderingMode(.multicolor)
-                        .font(.system(size: 30))
-                        .foregroundColor(.accentColor)
-                }
-                .buttonStyle(.borderless)
+        SelectableImage(imageState: imageState,
+                        imageStyle: imageStyle)
+        .overlay(alignment: .bottomTrailing) {
+            PhotosPicker(
+                selection: $imageSelection,
+                matching: .images,
+                photoLibrary: .shared()
+            ) {
+                Image(systemName: "pencil.circle.fill")
+                    .symbolRenderingMode(.multicolor)
+                    .foregroundColor(.pink)
+                    .padding(imageStyle == .circular ? 0 : 2)
             }
-            .onChange(of: imageSelection) { newSelection in
-                if let newSelection {
-                    loadImage(from: newSelection)
-                } else {
-                    imageState = .empty
-                }
+            .buttonStyle(.borderless)
+        }
+        .onChange(of: imageSelection) { newSelection in
+            if let newSelection {
+                loadImage(from: newSelection)
+            } else {
+                imageState = .empty
             }
+        }
     }
 
     // MARK: -
     private func loadImage(from imageSelection: PhotosPickerItem) {
-        imageState = .loading
-
-        imageSelection.loadTransferable(type: ProfileImage.self) { result in
+        imageSelection.loadTransferable(type: TransferableImage.self) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let profileImage?):
@@ -126,5 +156,7 @@ struct EditableCircularProfileImage: View {
 }
 
 #Preview {
-    EditableCircularProfileImage()
+    EditableImage(imageStyle: .square) { image in
+        print("image: \(image)")
+    }
 }

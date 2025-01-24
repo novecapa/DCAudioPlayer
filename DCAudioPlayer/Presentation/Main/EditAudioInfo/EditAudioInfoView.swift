@@ -21,32 +21,20 @@ struct EditAudioInfoView: View {
         GeometryReader { geometry in
             VStack {
                 ScrollView {
-                    Image(systemName: .airpodsMax)
-                        .scaledToFit()
-                        .frame(width: geometry.size.width,
-                               height: geometry.size.width)
-                        .background(.gray.opacity(0.4))
-                        .clipped()
-                        .cornerRadius(Constants.cornerRadius)
-                        .padding(.top, .paddingM)
-                        .foregroundStyle(.pink)
+                    EditableImage(imageStyle: .square) { _ in
+                        // TODO: Save image
+                    }
+                    .frame(width: geometry.size.width,
+                           height: geometry.size.width)
+                    .cornerRadius(Constants.cornerRadius)
+                    .padding(.top, .paddingM)
 
                     HStack(spacing: 0) {
-                        if let image = UIImage(contentsOfFile: viewModel.previewAudioData.authorAvatar) {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                                .clipShape(Circle())
-                                .frame(width: 40, height: 40)
-                                .padding(.leading, 12)
-                        } else {
-                            Image(systemName: .userCircle)
-                                .resizable()
-                                .scaledToFit()
-                                .clipShape(Circle())
-                                .frame(width: 40, height: 40)
-                                .padding(.leading, 12)
+                        EditableImage(imageStyle: .circular) { _ in
+                            // TODO: Save image
                         }
+                        .frame(width: 60, height: 60)
+                        .padding(.leading, 12)
                         VStack(alignment: .leading) {
                             TextField("Título".localized(),
                                       text: $viewModel.title)
@@ -55,12 +43,14 @@ struct EditAudioInfoView: View {
                                 .padding(.top, 12)
                                 .padding(.bottom, 6)
                                 .foregroundStyle(.black)
+                                .tint(.pink)
                             TextField("Autor".localized(),
                                       text: $viewModel.author)
                                 .font(.subheadline)
                                 .lineLimit(2)
                                 .padding(.bottom, 8)
                                 .foregroundStyle(.black)
+                                .tint(.pink)
                         }
                         .padding(.leading, 12)
                         Spacer()
@@ -81,6 +71,7 @@ struct EditAudioInfoView: View {
                                 Text("Descripción".localized())
                             })
                             .padding(12)
+                            .tint(.pink)
                         }
                         Spacer()
                     }

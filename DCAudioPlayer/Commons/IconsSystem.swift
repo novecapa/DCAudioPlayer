@@ -24,7 +24,7 @@ enum IconsSystem {
         case .airpodsMax:
             "airpods.max"
         case .userCircle:
-            "person.circle.fill"
+            "person.fill"
         case .backward(let seconds):
             "gobackward.\(seconds)"
         case .forward(let seconds):
