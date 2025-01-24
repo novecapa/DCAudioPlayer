@@ -16,7 +16,6 @@ struct AudioListView: View {
     }
 
     @Environment(AudioPlayerManager.self) var audioPlayer: AudioPlayerManager
-
     @State var viewModel: AudioListViewModel
 
     var body: some View {
@@ -81,5 +80,7 @@ struct AudioListView: View {
 }
 
 #Preview {
+    let audioPlayer = AudioPlayerManager()
     AudioListViewBuilderMock().build()
+        .environment(audioPlayer)
 }

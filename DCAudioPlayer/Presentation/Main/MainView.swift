@@ -10,52 +10,74 @@ import SwiftUI
 
 struct MainView: View {
 
-    @State private var selectedTab = 0
+    enum Constants {
+        static let tabBarHeight: CGFloat = 44
+    }
 
-    @State var presentPlayer: Bool = false
+    @State private var selectedTab = 0
+    @State var isPlayerPresented: Bool = false
+
     @State private var audioPlayer: AudioPlayerManager
     @State private var viewModel: MainViewModel
+    private let audioListView: AudioListView
+
+    // MARK: - Initializer
     init(audioPlayer: AudioPlayerManager = AudioPlayerManager(),
-         viewModel: MainViewModel) {
+         viewModel: MainViewModel,
+         audioListView: AudioListView = AudioListViewBuilder().build()) {
         self.audioPlayer = audioPlayer
         self.viewModel = viewModel
+        self.audioListView = audioListView
     }
 
     var body: some View {
         ZStack {
             TabView(selection: $selectedTab) {
-                AudioListViewBuilder().build()
+                audioListView
                     .tabItem {
-                        Image(systemName: "airpods.max")
+                        Image(systemName: .airpodsMax)
                         Text("Audios".localized())
                     }
                     .tag(0)
             }
             .environment(audioPlayer)
-            if audioPlayer.isPlaying && selectedTab != 1 {
-                VStack {
-                    Spacer()
-                    AudioPlayerMiniView(audioPlayer: audioPlayer)
-                        .background(.white)
-                        .onTapGesture {
-                            presentPlayer.toggle()
-                        }
-                }
-                .padding(.bottom, 44)
+
+            if shouldShowMiniPlayer {
+                miniPlayerView
             }
         }
         .sheet(isPresented: $viewModel.showAudioDetails,
-               onDismiss: {
-            print("onDismiss")
-        }, content: {
+               onDismiss: handleDismissDetails) {
             if let url = viewModel.filePath {
                 EditAudioInfoViewBuilder().build(fileURL: url,
                                                  useCase: viewModel.useCase)
             }
-        })
-        .fullScreenCover(isPresented: $presentPlayer) {
+        }
+        .fullScreenCover(isPresented: $isPlayerPresented) {
             AudioPlayerViewBuilder().build(audioPlayer)
         }
+    }
+
+    // MARK: - Computed Views
+    private var shouldShowMiniPlayer: Bool {
+        audioPlayer.isPlaying
+    }
+
+    private var miniPlayerView: some View {
+        VStack {
+            Spacer()
+            AudioPlayerMiniView(audioPlayer: audioPlayer)
+                .background(Color.white)
+                .onTapGesture {
+                    isPlayerPresented.toggle()
+                }
+        }
+        .padding(.bottom, Constants.tabBarHeight)
+    }
+
+    // MARK: - Handlers
+    private func handleDismissDetails() {
+        audioListView.viewModel.getAudioList()
     }
 }
 
