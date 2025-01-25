@@ -10,7 +10,7 @@ import Foundation
 protocol UtilsProtocol {
     var getCurrentMillis: Double { get }
     var getDocumentsDirectory: URL { get }
-    func getMP3Path(_ fileName: String) -> URL
+    func getFilePath(_ fileName: String) -> URL
     var getFileManager: FileManager { get }
     func createDirectory(directoryName: String)
     var hasConnection: Bool { get }

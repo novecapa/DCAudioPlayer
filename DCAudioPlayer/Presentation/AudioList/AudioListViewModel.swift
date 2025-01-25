@@ -68,19 +68,6 @@ extension AudioListViewModel {
         }
     }
 
-    var alert: Alert {
-        Alert(
-            title: Text("Atención".localized()),
-            message: Text(alertMessage),
-            dismissButton:
-                    .default(
-                        Text("Aceptar".localized()),
-                        action: {
-                            self.showAlert = false
-            })
-        )
-    }
-
     // Search
     var filteredAudios: [AudioFileEntity] {
         if searchText.isEmpty && searchText.count < 3 {
@@ -114,5 +101,11 @@ extension AudioListViewModel {
             }),
             secondaryButton: .default(Text("No, Cancelar".localized()))
         )
+    }
+
+    // Edit action
+    func editAudio(_ audio: AudioFileEntity) {
+        // TODO: --
+        print("edit audio")
     }
 }

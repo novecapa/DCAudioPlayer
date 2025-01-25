@@ -12,7 +12,7 @@ struct AudioPlayerView: View {
 
     enum Constants {
         static let iconSize: CGFloat = 24
-        static let avatarSize: CGFloat = 40
+        static let avatarSize: CGFloat = 60
         static let customHeight: CGFloat = 50
         static let cornerRadius: CGFloat = 8
     }
@@ -57,7 +57,8 @@ struct AudioPlayerView: View {
                 ScrollView(showsIndicators: false) {
                     if let image = viewModel.coverAudio {
                         Image(uiImage: image)
-                            .scaledToFit()
+                            .resizable()
+                            .aspectRatio(1, contentMode: .fit)
                             .frame(height: geometry.size.width)
                             .background(.gray.opacity(0.4))
                             .clipped()
@@ -72,6 +73,7 @@ struct AudioPlayerView: View {
                             .foregroundColor(.pink)
                             .clipped()
                             .cornerRadius(Constants.cornerRadius)
+                            .padding(.top, .paddingM)
                     }
 
                     VStack(alignment: .leading) {
@@ -82,12 +84,14 @@ struct AudioPlayerView: View {
                         HStack {
                             if let image = viewModel.authorAvatar {
                                 Image(uiImage: image)
-                                    .scaledToFit()
+                                    .resizable()
+                                    .scaledToFill()
                                     .clipShape(Circle())
                                     .frame(width: Constants.avatarSize,
                                            height: Constants.avatarSize)
+                                    .clipped()
                             } else {
-                                Image(systemName: .userCircle)
+                                Image(systemName: .userCircle(true))
                                     .resizable()
                                     .scaledToFit()
                                     .clipShape(Circle())
@@ -160,4 +164,12 @@ struct AudioPlayerView: View {
             }
         }
     }
+}
+#Preview {
+    let persistentContainer = SwiftDataContainer(isStoredInMemoryOnly: true)
+    let database = AudioFileDatabase(databaseManager: persistentContainer)
+    let repository = AudioFilesRepository(audioFilesDatabse: database)
+    let useCase = AudioFileUseCase(repository: repository)
+    AudioPlayerView(viewModel: AudioPlayerViewModel(useCase: useCase,
+                                                    audioPlayer: AudioPlayerManager()))
 }

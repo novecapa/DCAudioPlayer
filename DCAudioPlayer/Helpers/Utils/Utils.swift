@@ -50,7 +50,7 @@ class Utils: UtilsProtocol {
             .relativePath, withIntermediateDirectories: true, attributes: nil)
     }
 
-    func getMP3Path(_ fileName: String) -> URL {
+    func getFilePath(_ fileName: String) -> URL {
         let pdfFolder = getDocumentsDirectory.appendingPathComponent(Constants.audioFolder)
         return pdfFolder.appendingPathComponent(fileName)
     }

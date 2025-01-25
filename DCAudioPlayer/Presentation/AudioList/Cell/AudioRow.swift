@@ -9,56 +9,65 @@ import SwiftUI
 
 struct AudioRow: View {
 
+    private enum Constants {
+        static let avatarSize: CGFloat = 60
+    }
+
     private let audio: AudioFileEntity
     private let selectedAudio: (AudioFileEntity) -> Void
+    private let utils: UtilsProtocol
     init(audio: AudioFileEntity,
+         utils: UtilsProtocol = Utils(),
          selectedAudio: @escaping (AudioFileEntity) -> Void) {
         self.audio = audio
+        self.utils = utils
         self.selectedAudio = selectedAudio
     }
 
     var body: some View {
         HStack(spacing: 0) {
-            if let image = UIImage(contentsOfFile: audio.authorAvatar) {
+            let url = utils.getFilePath(audio.authorAvatar)
+            if let image = UIImage(contentsOfFile: url.path) {
                 Image(uiImage: image)
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
                     .clipShape(Circle())
-                    .frame(width: 40, height: 40)
-                    .padding(.leading, 12)
+                    .frame(width: Constants.avatarSize, height: Constants.avatarSize)
+                    .padding(.paddingM)
+                    .clipped()
             } else {
-                Image(systemName: "person.circle.fill")
+                Image(systemName: .userCircle(true))
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
                     .clipShape(Circle())
-                    .frame(width: 40, height: 40)
-                    .padding(.leading, 12)
+                    .frame(width: Constants.avatarSize, height: Constants.avatarSize)
+                    .padding(.paddingM)
             }
             VStack(alignment: .leading) {
                 Text(audio.title)
                     .font(.headline)
                     .multilineTextAlignment(.leading)
-                    .padding(.top, 12)
-                    .padding(.bottom, 6)
+                    .padding(.top, .paddingM)
+                    .padding(.bottom, .paddingS)
                     .foregroundStyle(.black)
                 Text(audio.author)
                     .font(.subheadline)
                     .lineLimit(2)
-                    .padding(.bottom, 8)
+                    .padding(.bottom, .paddingS)
                     .foregroundStyle(.black)
             }
-            .padding(.leading, 12)
+            .padding(.leading, .paddingM)
             Spacer()
             Text(audio.duration.toTimming)
                 .font(.subheadline)
                 .lineLimit(2)
-                .padding(.horizontal, 12)
+                .padding(.horizontal, .paddingM)
                 .foregroundStyle(.black)
         }
-        .frame(minHeight: 60)
+        .frame(minHeight: Constants.avatarSize)
         .background(.gray.opacity(0.4))
         .cornerRadius(6)
-        .padding(.horizontal, 12)
+        .padding(.horizontal, .paddingM)
         .onTapGesture {
             selectedAudio(audio)
         }

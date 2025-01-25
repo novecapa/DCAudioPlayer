@@ -16,12 +16,15 @@ final class AudioPlayerViewModel {
     private let useCase: AudioFileUseCase
     private let audioManager: AudioPlayerManager
     private let audioUuid: String
+    private let utils: UtilsProtocol
     init(useCase: AudioFileUseCase,
          audioPlayer: AudioPlayerManager,
-         audioUuid: String = "") {
+         audioUuid: String = "",
+         utils: UtilsProtocol = Utils()) {
         self.useCase = useCase
         self.audioManager = audioPlayer
         self.audioUuid = audioUuid
+        self.utils = utils
         self.audioManager.delegate = self
     }
 
@@ -61,7 +64,8 @@ extension AudioPlayerViewModel {
     }
 
     var coverAudio: UIImage? {
-        UIImage(contentsOfFile: audioFile.cover)
+        let url = utils.getFilePath(audioFile.cover)
+        return UIImage(contentsOfFile: url.path)
     }
 
     var title: String {
@@ -69,7 +73,8 @@ extension AudioPlayerViewModel {
     }
 
     var authorAvatar: UIImage? {
-        UIImage(contentsOfFile: audioFile.authorAvatar)
+        let url = utils.getFilePath(audioFile.authorAvatar)
+        return UIImage(contentsOfFile: url.path)
     }
 
     var author: String {

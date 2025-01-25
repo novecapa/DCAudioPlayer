@@ -57,7 +57,7 @@ final class EditAudioInfoViewModel {
     func saveFile() {
         do {
             let fileManager = utils.getFileManager
-            let destinationURL = utils.getMP3Path(fileName)
+            let destinationURL = utils.getFilePath(fileName)
             if fileManager.fileExists(atPath: destinationURL.path) {
                 try fileManager.removeItem(at: destinationURL)
             }
@@ -80,7 +80,7 @@ final class EditAudioInfoViewModel {
     }
 
     var audioDuration: TimeInterval {
-        let fileUrl = utils.getMP3Path(fileName)
+        let fileUrl = utils.getFilePath(fileName)
         let audioPlayer = try? AVAudioPlayer(contentsOf: fileUrl)
         return audioPlayer?.duration ?? 0
     }
@@ -134,5 +134,20 @@ final class EditAudioInfoViewModel {
             dateCreated: utils.getCurrentMillis,
             dateUpdated: 0
         )
+    }
+
+    func saveImage(image: UIImage, from type: ImageStyle) {
+        guard let imageData = image.pngData() else {
+            return
+        }
+        let imageFileName = fileURL.hashValue.toString + "_" + type.rawValue + ".png"
+        let fileURL = utils.getFilePath(imageFileName)
+        try? imageData.write(to: fileURL)
+        switch type {
+        case .circular:
+            self.authorImagePath = imageFileName
+        case .square:
+            self.coverImagePath = imageFileName
+        }
     }
 }

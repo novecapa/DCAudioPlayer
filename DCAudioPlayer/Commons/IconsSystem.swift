@@ -11,7 +11,7 @@ enum IconsSystem {
     case trash
     case arrowDown
     case airpodsMax
-    case userCircle
+    case userCircle(Bool)
     case backward(Int)
     case forward(Int)
 
@@ -23,8 +23,8 @@ enum IconsSystem {
             "chevron.down"
         case .airpodsMax:
             "airpods.max"
-        case .userCircle:
-            "person.fill"
+        case .userCircle(let filled):
+            filled ? "person.circle.fill" : "person.circle.fill"
         case .backward(let seconds):
             "gobackward.\(seconds)"
         case .forward(let seconds):
@@ -45,8 +45,8 @@ extension String {
         IconsSystem.airpodsMax.icon
     }
 
-    static var userCircle: String {
-        IconsSystem.userCircle.icon
+    static func userCircle(_ filled: Bool) -> String {
+        IconsSystem.userCircle(filled).icon
     }
 
     static func backward(_ seconds: Int) -> String {

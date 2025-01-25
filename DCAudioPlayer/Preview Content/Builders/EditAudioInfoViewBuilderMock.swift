@@ -12,7 +12,7 @@ final class EditAudioInfoViewBuilderMock: EditAudioInfoViewBuilderProtocol {
 	func build(fileURL: URL, useCase: AudioFileUseCaseProtocol) -> EditAudioInfoView {
         let utils: UtilsProtocol = Utils()
         let viewModel = EditAudioInfoViewModel(fileURL: fileURL, useCase: useCase, utils: utils)
-        let view = EditAudioInfoView(viewModel: viewModel)
+        let view = EditAudioInfoView(viewModel: viewModel, audioEntity: nil)
 		return view
 	}
 }

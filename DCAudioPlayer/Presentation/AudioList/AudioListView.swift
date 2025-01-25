@@ -48,6 +48,10 @@ struct AudioListView: View {
                                         icon: .trash) {
                                 viewModel.deleteAlert(audio)
                             }
+                            SwipeAction(tint: .green,
+                                        icon: .airpodsMax) {
+                                viewModel.editAudio(audio)
+                            }
                         }
                     }
                 }
@@ -63,7 +67,7 @@ struct AudioListView: View {
         }
         .alert(isPresented: $viewModel.showAlert,
                content: {
-            viewModel.alert
+            viewModel.deleteAlert
         })
         .fullScreenCover(
             isPresented: $viewModel.showPlayer,

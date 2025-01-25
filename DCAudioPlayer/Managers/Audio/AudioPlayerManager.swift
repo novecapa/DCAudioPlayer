@@ -36,7 +36,7 @@ final class AudioPlayerManager {
             return
         }
         self.currentTrack = currentTrack
-        let url = utils.getMP3Path(currentTrack.fileName)
+        let url = utils.getFilePath(currentTrack.fileName)
         do {
             if player != nil {
                 player?.stop()

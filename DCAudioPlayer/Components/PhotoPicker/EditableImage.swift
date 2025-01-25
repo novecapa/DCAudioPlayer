@@ -11,12 +11,12 @@ import SwiftUI
 // MARK: - ImageState
 enum ImageState {
     case empty
-    case success(Image)
+    case success(TransferableImage)
     case failure(Error)
 }
 
 // MARK: - ImageStyle
-enum ImageStyle {
+enum ImageStyle: String {
     case square
     case circular
 }
@@ -43,10 +43,11 @@ struct SelectableImageView: View {
     var body: some View {
         switch imageState {
         case .success(let image):
-            image.resizable()
+            Image(uiImage: image.image)
+                .resizable()
                 .frame(minWidth: 40, minHeight: 40)
         case .empty:
-            let image = Image(systemName: imageStyle == .circular ? .userCircle : .airpodsMax)
+            let image = Image(systemName: imageStyle == .circular ? .userCircle(true) : .airpodsMax)
             if imageStyle == .circular {
                 image
                 .resizable()
@@ -111,29 +112,43 @@ struct EditableImage: View {
     }
     @State private var imageSelection: PhotosPickerItem?
     let imageStyle: ImageStyle
-    let selectedImage: (Image) -> Void
+    let selectedImage: (TransferableImage) -> Void
 
     var body: some View {
         SelectableImage(imageState: imageState,
                         imageStyle: imageStyle)
-        .overlay(alignment: .bottomTrailing) {
+        .overlay(
             PhotosPicker(
                 selection: $imageSelection,
                 matching: .images,
-                photoLibrary: .shared()
-            ) {
-                Image(systemName: "pencil.circle.fill")
-                    .symbolRenderingMode(.multicolor)
-                    .foregroundColor(.pink)
-                    .padding(imageStyle == .circular ? 0 : 2)
-            }
-            .buttonStyle(.borderless)
-        }
-        .onChange(of: imageSelection) { newSelection in
-            if let newSelection {
-                loadImage(from: newSelection)
+                photoLibrary: .shared(),
+                label: {
+                    Image("")
+                        .frame(maxWidth: .infinity,
+                               maxHeight: .infinity)
+                        .padding()
+                }
+            )
+        )
+        .onChange(of: imageSelection, { _, newValue in
+            if let newValue {
+                loadImage(from: newValue)
             } else {
                 imageState = .empty
+            }
+        })
+        .onAppear {
+            requestPermissions()
+        }
+    }
+
+    private func requestPermissions() {
+        PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+            switch status {
+            case .authorized:
+                break
+            default:
+                break
             }
         }
     }
@@ -144,7 +159,7 @@ struct EditableImage: View {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let profileImage?):
-                    self.imageState = .success(Image(uiImage: profileImage.image))
+                    self.imageState = .success(profileImage)
                 case .success(nil):
                     self.imageState = .empty
                 case .failure(let error):

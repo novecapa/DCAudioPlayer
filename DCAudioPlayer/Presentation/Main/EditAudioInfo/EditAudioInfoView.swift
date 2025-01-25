@@ -16,22 +16,28 @@ struct EditAudioInfoView: View {
 
     @Environment(\.dismiss) var dismiss
     @State var viewModel: EditAudioInfoViewModel
+    private let audioEntity: AudioFileEntity?
+
+    init(viewModel: EditAudioInfoViewModel, audioEntity: AudioFileEntity?) {
+        self.viewModel = viewModel
+        self.audioEntity = audioEntity
+    }
 
     var body: some View {
         GeometryReader { geometry in
             VStack {
                 ScrollView {
-                    EditableImage(imageStyle: .square) { _ in
-                        // TODO: Save image
+                    EditableImage(imageStyle: .square) { image in
+                        viewModel.saveImage(image: image.image, from: .square)
                     }
                     .frame(width: geometry.size.width,
                            height: geometry.size.width)
                     .cornerRadius(Constants.cornerRadius)
-                    .padding(.top, .paddingM)
+                    .padding(.top, .paddingL)
 
                     HStack(spacing: 0) {
-                        EditableImage(imageStyle: .circular) { _ in
-                            // TODO: Save image
+                        EditableImage(imageStyle: .circular) { image in
+                            viewModel.saveImage(image: image.image, from: .circular)
                         }
                         .frame(width: 60, height: 60)
                         .padding(.leading, 12)
