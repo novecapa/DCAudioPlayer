@@ -134,27 +134,13 @@ final class AudioPlayerManager {
         nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = player?.rate
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = player?.currentTime
 
-        // TODO: ---
-//        guard let iconURL = currentTrack.coverUrl else { return }
-//        if let cachedImage = imageCache.object(forKey: iconURL as NSURL) {
-//            let artwork = MPMediaItemArtwork(boundsSize: cachedImage.size) { _ in cachedImage }
-//            nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
-//            playingInfoCenter.nowPlayingInfo = nowPlayingInfo
-//        } else {
-//            URLSession.shared.dataTask(with: iconURL) { [weak self] data, _, _ in
-//                guard let self = self,
-//                      let data = data,
-//                      let downloadedImage = UIImage(data: data) else {
-//                    return
-//                }
-//                DispatchQueue.main.async {
-//                    self.imageCache.setObject(downloadedImage, forKey: iconURL as NSURL)
-//                    let artwork = MPMediaItemArtwork(boundsSize: downloadedImage.size) { _ in downloadedImage }
-//                    nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
-//                    playingInfoCenter.nowPlayingInfo = nowPlayingInfo
-//                }
-//            }.resume()
-//        }
+        // Image cover
+        let url = utils.getFilePath(currentTrack.cover)
+        if let image = UIImage(contentsOfFile: url.path) {
+            let artwork = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
+            nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
+            playingInfoCenter.nowPlayingInfo = nowPlayingInfo
+        }
     }
 
     private func stopTimer() {
