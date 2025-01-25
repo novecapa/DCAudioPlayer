@@ -13,9 +13,12 @@ struct AudioRow: View {
         static let avatarSize: CGFloat = 60
     }
 
+    // MARK: - Private Properties
     private let audio: AudioFileEntity
     private let selectedAudio: (AudioFileEntity) -> Void
     private let utils: UtilsProtocol
+
+    // MARK: - Initializer
     init(audio: AudioFileEntity,
          utils: UtilsProtocol = Utils(),
          selectedAudio: @escaping (AudioFileEntity) -> Void) {

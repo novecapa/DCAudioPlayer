@@ -12,14 +12,13 @@ import SwiftUI
 @Observable
 final class EditAudioInfoViewModel {
 
-    // MARK: Public
+    // MARK: - Public Properties
     var title: String = ""
     var author: String = ""
     var desc: String = ""
     var coverImagePath: String = ""
     var authorImagePath: String = ""
 
-    // MARK: Alert message
     var alertMessage: String = "" {
         didSet {
             if !alertMessage.isEmpty {
@@ -33,6 +32,8 @@ final class EditAudioInfoViewModel {
     private let fileURL: URL
     private let useCase: AudioFileUseCaseProtocol
     private let utils: UtilsProtocol
+
+    // MARK: - Initializer
     init(fileURL: URL,
          useCase: AudioFileUseCaseProtocol,
          utils: UtilsProtocol) {

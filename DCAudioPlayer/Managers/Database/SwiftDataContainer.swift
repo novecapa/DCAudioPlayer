@@ -10,7 +10,10 @@ import SwiftData
 
 final class SwiftDataContainer: SwiftDataContainerProtocol {
 
+    // MARK: - Public Properties
     let container: ModelContainer
+
+    // MARK: - Initializer
     init(isStoredInMemoryOnly: Bool) {
         do {
             self.container = try ModelContainer(

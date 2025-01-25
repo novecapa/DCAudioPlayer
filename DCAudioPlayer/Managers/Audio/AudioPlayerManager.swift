@@ -17,60 +17,87 @@ protocol AudioPlayerManagerProtocol {
 @Observable
 final class AudioPlayerManager {
 
-    var isPlaying: Bool = false
-    var currentTrack: AudioFileEntity = .empty
-    var currentPosition: Double = 0
+    // MARK: - Public Properties
+    var isPlaying: Bool = false {
+        didSet { delegate?.audioStateChanged() }
+    }
+    var currentTrack: AudioFileEntity = .empty {
+        didSet { loadAudioIfNeeded() }
+    }
+    var currentPosition: Double = 0 {
+        didSet { delegate?.audioTimeChanged(currentPosition) }
+    }
 
+    weak var delegate: AudioPlayerManagerProtocol?
+
+    // MARK: - Private Properties
     private var player: AVAudioPlayer?
     private var timer: Timer?
-    var delegate: AudioPlayerManagerProtocol?
-
     private let utils: UtilsProtocol
+    private let imageCache = NSCache<NSURL, UIImage>()
+
+    // MARK: - Initializer
     init(utils: UtilsProtocol = Utils()) {
         self.utils = utils
     }
 
+    // MARK: - Audio Loading
     func loadAudio(currentTrack: AudioFileEntity) {
-        guard self.currentTrack != currentTrack else {
-            startTimer()
-            return
-        }
         self.currentTrack = currentTrack
+    }
+
+    private func loadAudioIfNeeded() {
+        guard currentTrack != .empty else { return }
+
         let url = utils.getFilePath(currentTrack.fileName)
         do {
-            if player != nil {
-                player?.stop()
-                isPlaying = false
-                player = nil
-            }
+            stopPlayback()
+
             player = try AVAudioPlayer(contentsOf: url)
             player?.prepareToPlay()
             currentPosition = currentTrack.lastPositionAtSecond
-            setupAVAudioSession()
-            setupCommandCenter(title: currentTrack.title,
-                               description: currentTrack.desc)
+
+            setupAudioSession()
+            setupCommandCenter(title: currentTrack.title, description: currentTrack.desc)
         } catch {
-            print("Error: \(error.localizedDescription)")
+            print("Error loading audio: \(error.localizedDescription)")
         }
     }
 
-    private func setupAVAudioSession() {
-        let audioInstance = AVAudioSession.sharedInstance()
-        try? audioInstance.setCategory(.playback)
-        try? audioInstance.setActive(true)
+    private func stopPlayback() {
+        if let player = player {
+            player.stop()
+        }
+        isPlaying = false
+        player = nil
+    }
+
+    // MARK: - AVAudioSession Setup
+    private func setupAudioSession() {
+        let audioSession = AVAudioSession.sharedInstance()
+        try? audioSession.setCategory(.playback)
+        try? audioSession.setActive(true)
         UIApplication.shared.beginReceivingRemoteControlEvents()
     }
 
-    private func setupCommandCenter(title: String,
-                                    description: String) {
-        setupInfoMediaPlayer(title: title, description: description)
+    // MARK: - Command Center
+    private func setupCommandCenter(title: String, description: String) {
+        configureNowPlayingInfo(title: title, description: description)
 
         let commandCenter = MPRemoteCommandCenter.shared()
         commandCenter.playCommand.isEnabled = true
-        commandCenter.pauseCommand.isEnabled = true
-        commandCenter.changePlaybackPositionCommand.isEnabled = true
+        commandCenter.playCommand.addTarget { [weak self] _ in
+            self?.play()
+            return .success
+        }
 
-        // Seek
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.pauseCommand.addTarget { [weak self] _ in
+            self?.pause()
+            return .success
+        }
+
+        commandCenter.changePlaybackPositionCommand.isEnabled = true
         commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
             guard let self = self, let event = event as? MPChangePlaybackPositionCommandEvent else {
                 return .commandFailed
@@ -78,24 +105,14 @@ final class AudioPlayerManager {
             self.seek(to: event.positionTime)
             return .success
         }
-        // Play
-        commandCenter.playCommand.addTarget { [weak self] (_) -> MPRemoteCommandHandlerStatus in
-            self?.play()
-            return .success
-        }
-        // Pause
-        commandCenter.pauseCommand.addTarget { [weak self] (_) -> MPRemoteCommandHandlerStatus in
-            self?.pause()
-            return .success
-        }
-        // Forward
+
         commandCenter.skipForwardCommand.isEnabled = true
         commandCenter.skipForwardCommand.preferredIntervals = [NSNumber(value: 15)]
         commandCenter.skipForwardCommand.addTarget { [weak self] _ in
             self?.forward()
             return .success
         }
-        // Backward
+
         commandCenter.skipBackwardCommand.isEnabled = true
         commandCenter.skipBackwardCommand.preferredIntervals = [NSNumber(value: 15)]
         commandCenter.skipBackwardCommand.addTarget { [weak self] _ in
@@ -104,42 +121,31 @@ final class AudioPlayerManager {
         }
     }
 
-    func seek(to time: TimeInterval) {
-        let targetTime = CMTime(seconds: time, preferredTimescale: 1)
-        seekTo(targetTime.seconds)
-        updateNowPlayingInfo()
-    }
+    // MARK: - Now Playing Info
+    private func configureNowPlayingInfo(title: String, description: String) {
+        var nowPlayingInfo: [String: Any] = [
+            MPMediaItemPropertyTitle: title,
+            MPMediaItemPropertyArtist: description,
+            MPMediaItemPropertyPlaybackDuration: player?.duration ?? 0,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: player?.currentTime ?? 0,
+            MPNowPlayingInfoPropertyPlaybackRate: player?.rate ?? 0
+        ]
 
-    func updateNowPlayingInfo() {
-        if var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo {
-            nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = player?.currentTime
-            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = player?.rate
-            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
-        }
-    }
-
-    let imageCache = NSCache<NSURL, UIImage>()
-    private func setupInfoMediaPlayer(title: String,
-                                      description: String) {
-        // Playing info center singleton
-        let playingInfoCenter = MPNowPlayingInfoCenter.default()
-        var nowPlayingInfo = [String: Any]()
-
-        // Prepare title and subtitle
-        nowPlayingInfo[MPMediaItemPropertyTitle] = title
-        nowPlayingInfo[MPMediaItemPropertyArtist] = description
-
-        // Time status
-        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = player?.duration
-        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = player?.rate
-        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = player?.currentTime
-
-        // Image cover
-        let url = utils.getFilePath(currentTrack.cover)
-        if let image = UIImage(contentsOfFile: url.path) {
+        let coverURL = utils.getFilePath(currentTrack.cover)
+        if let image = UIImage(contentsOfFile: coverURL.path) {
             let artwork = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
             nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
-            playingInfoCenter.nowPlayingInfo = nowPlayingInfo
+        }
+
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    }
+
+    // MARK: - Timer Management
+    private func startTimer() {
+        stopTimer()
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            guard let self = self, let player = self.player else { return }
+            self.currentPosition = player.currentTime
         }
     }
 
@@ -148,19 +154,7 @@ final class AudioPlayerManager {
         timer = nil
     }
 
-    private func startTimer() {
-        stopTimer()
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            guard let self = self, let player = self.player else { return }
-            self.currentPosition = player.currentTime
-            self.updateNowPlayingInfo()
-            guard self.currentPosition > 0 else { return }
-            self.delegate?.audioTimeChanged(self.currentPosition)
-        }
-    }
-}
-// MARK: Public methods
-extension AudioPlayerManager {
+    // MARK: - Playback Controls
     func play() {
         guard let player = player else { return }
         player.play()
@@ -176,21 +170,27 @@ extension AudioPlayerManager {
     }
 
     func backward() {
-        guard let player = player else { return }
-        player.currentTime -= 15
+        seek(by: -15)
     }
 
     func forward() {
-        guard let player = player else { return }
-        player.currentTime += 15
+        seek(by: 15)
     }
 
-    func seekTo(_ position: Double) {
+    private func seek(by seconds: TimeInterval) {
         guard let player = player else { return }
-        player.currentTime = position
-        currentPosition = position
+        let newTime = max(0, min(player.currentTime + seconds, player.duration))
+        seek(to: newTime)
     }
 
+    func seek(to time: TimeInterval) {
+        guard let player = player else { return }
+        player.currentTime = time
+        currentPosition = time
+        configureNowPlayingInfo(title: currentTrack.title, description: currentTrack.desc)
+    }
+
+    // MARK: - Public Computed Properties
     var duration: Double {
         player?.duration ?? 0
     }

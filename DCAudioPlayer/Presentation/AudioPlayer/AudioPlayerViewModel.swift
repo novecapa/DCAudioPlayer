@@ -11,12 +11,16 @@ import SwiftUI
 @Observable
 final class AudioPlayerViewModel {
 
+    // MARK: - Public Properties
     var audioFile: AudioFileEntity = .empty
 
+    // MARK: - Private Properties
     private let useCase: AudioFileUseCase
     private let audioManager: AudioPlayerManager
     private let audioUuid: String
     private let utils: UtilsProtocol
+
+    // MARK: - Initializer
     init(useCase: AudioFileUseCase,
          audioPlayer: AudioPlayerManager,
          audioUuid: String = "",
@@ -38,7 +42,7 @@ final class AudioPlayerViewModel {
             Task {
                 await self.audioFileStatus()
                 await MainActor.run {
-                    self.audioManager.seekTo(self.audioFile.lastPositionAtSecond)
+                    self.audioManager.seek(to: self.audioFile.lastPositionAtSecond)
                 }
             }
         }
@@ -133,7 +137,7 @@ extension AudioPlayerViewModel {
     }
 
     func seekTo(_ position: Double) {
-        audioManager.seekTo(position)
+        audioManager.seek(to: position)
         saveLastPosition(position)
     }
 

@@ -61,7 +61,7 @@ struct AudioPlayerMiniView: View {
                        minimumValue: 0,
                        maximumValue: audioPlayer.duration,
                        canUpdateTime: false) { position in
-                audioPlayer.seekTo(position)
+                audioPlayer.seek(to: position)
             }
             .padding(.horizontal, 24)
         }

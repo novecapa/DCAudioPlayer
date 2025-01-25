@@ -11,6 +11,7 @@ import SwiftUI
 @Observable
 final class MainViewModel {
 
+    // MARK: - Public Properties
     var alertMessage: String = "" {
         didSet {
             if !alertMessage.isEmpty {
@@ -19,7 +20,6 @@ final class MainViewModel {
         }
     }
     var showAlert: Bool = false
-
     var filePath: URL? {
         didSet {
             if filePath != nil {
@@ -28,8 +28,9 @@ final class MainViewModel {
         }
     }
     var showAudioDetails: Bool = false
-
     let useCase: AudioFileUseCaseProtocol
+
+    // MARK: - Initializer
     init(useCase: AudioFileUseCaseProtocol) {
         self.useCase = useCase
         startListenNotifications()

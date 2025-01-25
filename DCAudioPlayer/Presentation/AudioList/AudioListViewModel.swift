@@ -11,6 +11,7 @@ import SwiftUI
 @Observable
 final class AudioListViewModel {
 
+    // MARK: - Public Properties
     var showPlayer: Bool = false
     var searchText: String = ""
     var showAlert: Bool = false
@@ -28,7 +29,10 @@ final class AudioListViewModel {
         }
     }
 
+    // MARK: - Private Properties
     private let useCase: AudioFileUseCaseProtocol
+
+    // MARK: - Initializer
     init(useCase: AudioFileUseCaseProtocol) {
         self.useCase = useCase
     }
