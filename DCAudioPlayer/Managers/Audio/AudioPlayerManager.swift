@@ -9,7 +9,7 @@ import SwiftUI
 import MediaPlayer
 import AVFoundation
 
-protocol AudioPlayerManagerProtocol {
+protocol AudioPlayerManagerProtocol: AnyObject {
     func audioStateChanged()
     func audioTimeChanged(_ position: Double)
 }

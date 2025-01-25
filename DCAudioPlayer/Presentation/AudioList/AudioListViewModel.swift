@@ -66,6 +66,7 @@ extension AudioListViewModel {
         Task { @MainActor in
             do {
                 self.audioList = try await useCase.getAllAudioFiles()
+                print("audioList: \(audioList.count)")
             } catch {
                 handleError(error)
             }
