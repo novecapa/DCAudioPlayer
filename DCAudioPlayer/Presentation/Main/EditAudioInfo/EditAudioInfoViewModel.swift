@@ -32,14 +32,30 @@ final class EditAudioInfoViewModel {
     private let fileURL: URL
     private let useCase: AudioFileUseCaseProtocol
     private let utils: UtilsProtocol
+    private let audio: AudioFileEntity?
 
     // MARK: - Initializer
     init(fileURL: URL,
          useCase: AudioFileUseCaseProtocol,
-         utils: UtilsProtocol) {
+         utils: UtilsProtocol,
+         audio: AudioFileEntity?) {
         self.fileURL = fileURL
         self.useCase = useCase
         self.utils = utils
+        self.audio = audio
+
+        setupData()
+    }
+
+    private func setupData() {
+        guard let audio = audio else {
+            return
+        }
+        title = audio.title
+        author = audio.author
+        desc = audio.desc
+        coverImagePath = audio.cover
+        authorImagePath = audio.authorAvatar
     }
 
     private func handleError(_ error: Error) {

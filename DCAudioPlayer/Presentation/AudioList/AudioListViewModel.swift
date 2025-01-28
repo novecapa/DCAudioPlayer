@@ -15,7 +15,8 @@ final class AudioListViewModel {
     var showPlayer: Bool = false
     var searchText: String = ""
     var showAlert: Bool = false
-    var audioToDelete: AudioFileEntity?
+    var audioToUpdate: AudioFileEntity?
+    var showAudioDetails: Bool = false
 
     var audioList: [AudioFileEntity] = []
     var selectedAudio: AudioFileEntity?
@@ -29,12 +30,16 @@ final class AudioListViewModel {
         }
     }
 
+    let useCase: AudioFileUseCaseProtocol
+
     // MARK: - Private Properties
-    private let useCase: AudioFileUseCaseProtocol
+    private let utils: UtilsProtocol
 
     // MARK: - Initializer
-    init(useCase: AudioFileUseCaseProtocol) {
+    init(useCase: AudioFileUseCaseProtocol,
+         utils: UtilsProtocol = Utils()) {
         self.useCase = useCase
+        self.utils = utils
     }
 
     private func handleError(_ error: Error) {
@@ -66,7 +71,6 @@ extension AudioListViewModel {
         Task { @MainActor in
             do {
                 self.audioList = try await useCase.getAllAudioFiles()
-                print("audioList: \(audioList.count)")
             } catch {
                 handleError(error)
             }
@@ -88,7 +92,7 @@ extension AudioListViewModel {
 
     // Delete action
     func deleteAlert(_ audio: AudioFileEntity) {
-        audioToDelete = audio
+        audioToUpdate = audio
         showAlert = true
     }
 
@@ -97,11 +101,11 @@ extension AudioListViewModel {
             title: Text("Atención".localized()),
             message: Text("¿Estás seguro? El archivo se eliminará para siempre".localized()),
             primaryButton: .destructive(Text("Si, eliminar".localized()), action: { [weak self] in
-                guard let self, let audio = self.audioToDelete else { return }
+                guard let self, let audio = self.audioToUpdate else { return }
                 withAnimation {
                     self.deleteAudio(audio)
                 }
-                self.audioToDelete = nil
+                self.audioToUpdate = nil
                 showAlert = false
             }),
             secondaryButton: .default(Text("No, Cancelar".localized()))
@@ -109,8 +113,13 @@ extension AudioListViewModel {
     }
 
     // Edit action
+    var fileURL: URL? {
+        guard let fileName = audioToUpdate?.fileName else { return nil }
+        return utils.getFilePath(fileName)
+    }
+
     func editAudio(_ audio: AudioFileEntity) {
-        // TODO: --
-        print("edit audio")
+        audioToUpdate = audio
+        showAudioDetails = true
     }
 }

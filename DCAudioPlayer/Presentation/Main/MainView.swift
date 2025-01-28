@@ -50,7 +50,8 @@ struct MainView: View {
                onDismiss: handleDismissDetails) {
             if let url = viewModel.filePath {
                 EditAudioInfoViewBuilder().build(fileURL: url,
-                                                 useCase: viewModel.useCase)
+                                                 useCase: viewModel.useCase,
+                                                 audio: nil)
             }
         }
         .fullScreenCover(isPresented: $isPlayerPresented) {

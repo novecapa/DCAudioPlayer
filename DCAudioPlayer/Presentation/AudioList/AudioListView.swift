@@ -69,6 +69,16 @@ struct AudioListView: View {
                content: {
             viewModel.deleteAlert
         })
+        .sheet(isPresented: $viewModel.showAudioDetails, onDismiss: {
+            viewModel.audioToUpdate = nil
+            viewModel.getAudioList()
+        }, content: {
+            if let url = viewModel.fileURL {
+                EditAudioInfoViewBuilder().build(fileURL: url,
+                                                 useCase: viewModel.useCase,
+                                                 audio: viewModel.audioToUpdate)
+            }
+        })
         .fullScreenCover(
             isPresented: $viewModel.showPlayer,
             content: {

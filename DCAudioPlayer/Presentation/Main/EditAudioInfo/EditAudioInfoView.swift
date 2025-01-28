@@ -16,11 +16,9 @@ struct EditAudioInfoView: View {
 
     @Environment(\.dismiss) var dismiss
     @State var viewModel: EditAudioInfoViewModel
-    private let audioEntity: AudioFileEntity?
 
-    init(viewModel: EditAudioInfoViewModel, audioEntity: AudioFileEntity?) {
+    init(viewModel: EditAudioInfoViewModel) {
         self.viewModel = viewModel
-        self.audioEntity = audioEntity
     }
 
     var body: some View {
@@ -109,5 +107,6 @@ struct EditAudioInfoView: View {
     let repository = AudioFilesRepository(audioFilesDatabse: database)
     let useCase = AudioFileUseCase(repository: repository)
     EditAudioInfoViewBuilderMock().build(fileURL: URL(fileURLWithPath: "/path/to/file"),
-                                         useCase: useCase)
+                                         useCase: useCase,
+                                         audio: nil)
 }
