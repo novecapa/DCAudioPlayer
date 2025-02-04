@@ -83,7 +83,29 @@ final class AudioListViewModelTests: XCTestCase {
 
         // Then
         await fulfillment(of: [expectation], timeout: 2.0)
-        XCTAssertEqual(viewModel.audioToDelete, .mock)
+        XCTAssertEqual(viewModel.audioToUpdate, .mock)
         XCTAssertTrue(viewModel.showAlert)
+    }
+
+    func test_editAudio() async {
+        // Given -> Mock
+        let database = AudioFileDatabaseMock(audioFilesMock: [.mock])
+        let repository = AudioFilesRepository(audioFilesDatabse: database)
+        let useCase = AudioFileUseCase(repository: repository)
+        viewModel = AudioListViewModel(useCase: useCase)
+
+        // When
+        let expectation = XCTestExpectation(description: "Wait for it...")
+        Task { @MainActor in
+            viewModel.getAudioList()
+            viewModel.editAudio(.mock)
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            expectation.fulfill()
+        }
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertEqual(viewModel.audioToUpdate, .mock)
+        XCTAssertTrue(viewModel.showAudioDetails)
     }
 }
