@@ -9,6 +9,7 @@ import PhotosUI
 import SwiftUI
 
 // MARK: - ImageState
+
 enum ImageState {
     case empty
     case success(TransferableImage)
@@ -16,12 +17,14 @@ enum ImageState {
 }
 
 // MARK: - ImageStyle
+
 enum ImageStyle: String {
     case square
     case circular
 }
 
 // MARK: - TransferableImage
+
 struct TransferableImage: Transferable {
     let image: UIImage
 
@@ -36,6 +39,7 @@ struct TransferableImage: Transferable {
 }
 
 // MARK: - SelectableImageView
+
 struct SelectableImageView: View {
     let imageState: ImageState
     let imageStyle: ImageStyle
@@ -69,6 +73,7 @@ struct SelectableImageView: View {
 }
 
 // MARK: - SelectableImage
+
 struct SelectableImage: View {
     let imageState: ImageState
     let imageStyle: ImageStyle
@@ -98,6 +103,7 @@ struct SelectableImage: View {
 }
 
 // MARK: - EditableImage
+
 struct EditableImage: View {
 
     @State private var imageState: ImageState = .empty {
