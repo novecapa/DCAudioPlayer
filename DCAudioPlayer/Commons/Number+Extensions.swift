@@ -8,6 +8,7 @@
 import Foundation
 
 // MARK: Int
+
 extension Int {
     var toString: String {
         "\(self)"
@@ -19,6 +20,7 @@ extension Int {
 }
 
 // MARK: Double
+
 extension Double {
     var toString: String {
         "\(self)"
