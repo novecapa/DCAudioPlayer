@@ -8,6 +8,7 @@
 import Foundation
 
 // MARK: String
+
 extension String {
     var decodeB64: String {
         guard let base64String = self.data(using: .utf8),
