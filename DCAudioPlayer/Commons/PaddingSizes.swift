@@ -29,6 +29,9 @@ enum Paddings {
         }
     }
 }
+
+// MARK: CGFloat
+
 extension CGFloat {
     static var paddingS: CGFloat { Paddings.paddingS.size }
     static var paddingM: CGFloat { Paddings.paddingM.size }
