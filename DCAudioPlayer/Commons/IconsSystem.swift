@@ -32,6 +32,9 @@ enum IconsSystem {
         }
     }
 }
+
+// MARK: String
+
 extension String {
     static var trash: String {
         IconsSystem.trash.icon
